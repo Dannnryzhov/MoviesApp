@@ -3,12 +3,12 @@ package com.example.moviesapp.di
 import com.example.moviesapp.data.network.KinopoiskApiService
 import dagger.Module
 import dagger.Provides
-import jakarta.inject.Singleton
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Singleton
 
 @Module
 class NetworkModule {

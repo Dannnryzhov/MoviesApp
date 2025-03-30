@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">MoviesApp</string>
+    <string name="home">Главная</string>
+    <string name="downloaded">Избранное</string>
+    <string name="search">Поиск фильма...</string>
+    <string name="date">Дата выхода</string>
+    <string name="title">Название фильма</string>
 </resources>
