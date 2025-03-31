@@ -14,4 +14,11 @@ interface KinopoiskApiService {
         @Query("limit") limit: Int = 60,
         @Query("page") page: Int
     ): MovieResponse
+
+    @GET("movie/search")
+    suspend fun searchMovies(
+        @Query("page") page: Int = 1,
+        @Query("limit") limit: Int = 10,
+        @Query("query") query: String
+    ): MovieResponse
 }

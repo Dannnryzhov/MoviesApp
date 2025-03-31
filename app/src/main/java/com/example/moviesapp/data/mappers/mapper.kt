@@ -34,7 +34,7 @@ fun MovieDto.toDomain(): MovieEntity {
         name = this.name,
         description = this.description,
         year = this.year,
-        poster = this.poster.toDomain(),
+        poster = PosterEntity(url = this.poster.url ?: "default_url"),
         countries = this.countries.map { it.toDomain() },
         genres = this.genres.map { it.toDomain() }
     )

@@ -6,5 +6,5 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class PosterDto(
-    @SerializedName("url") val url: String
+    @SerializedName("url") val url: String?
 ): Parcelable

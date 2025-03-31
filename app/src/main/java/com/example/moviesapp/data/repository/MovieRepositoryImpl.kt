@@ -14,4 +14,8 @@ class MovieRepositoryImpl @Inject constructor(
         val response = kinopoiskApiService.getPopularMovies(page = page)
         return response.toDomainList()
     }
+    override suspend fun searchMovies(query: String): List<MovieEntity> {
+        val response = kinopoiskApiService.searchMovies(query = query)
+        return response.toDomainList()
+    }
 }
