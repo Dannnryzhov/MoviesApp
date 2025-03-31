@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.example.moviesapp.domain.models.MovieEntity
 import com.example.moviesapp.domain.usecases.GetPopularMoviesUseCase
+import com.example.moviesapp.domain.usecases.ManageFavouriteUseCase
 import com.example.moviesapp.domain.usecases.SearchMoviesUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,7 +14,8 @@ import javax.inject.Inject
 
 class MovieListViewModel @Inject constructor(
     private val getMoviesUseCase: GetPopularMoviesUseCase,
-    private val searchMoviesUseCase: SearchMoviesUseCase
+    private val searchMoviesUseCase: SearchMoviesUseCase,
+    private val manageFavouriteUseCase: ManageFavouriteUseCase
 ) : SearchViewModel() {
 
     init {
@@ -25,6 +27,12 @@ class MovieListViewModel @Inject constructor(
             val moviesList = getMoviesUseCase(1)
             Log.d("MovieListVM", "Получено фильмов: ${moviesList.size}")
             mutableMovies.value = moviesList
+        }
+    }
+
+    fun addToFavouriteMovie(movie: MovieEntity) {
+        viewModelScope.launch(exceptionHandler) {
+            manageFavouriteUseCase.add(movie)
         }
     }
 
