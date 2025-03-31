@@ -71,6 +71,8 @@ dependencies {
 
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
+
+    implementation(libs.paging.runtime)
     testImplementation(libs.junit)
 
     androidTestImplementation(libs.androidx.junit)

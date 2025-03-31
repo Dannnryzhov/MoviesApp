@@ -1,5 +1,8 @@
 package com.example.moviesapp.data.repository
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.example.moviesapp.data.database.FavouriteMovieDao
 import com.example.moviesapp.data.database.FavouriteMovieWithDetailsEntity
 import com.example.moviesapp.data.mappers.toCountryDbEntity
@@ -10,6 +13,7 @@ import com.example.moviesapp.data.mappers.toMovieDbEntity
 import com.example.moviesapp.data.network.KinopoiskApiService
 import com.example.moviesapp.domain.models.MovieEntity
 import com.example.moviesapp.domain.repository.MovieRepository
+import com.example.moviesapp.presentation.sources.MoviesPagingSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -57,5 +61,12 @@ class MovieRepositoryImpl @Inject constructor(
                     movie.countries.any { it.country.contains(query, ignoreCase = true) } ||
                     movie.genres.any { it.genre.contains(query, ignoreCase = true) }
         }
+    }
+
+    override fun getPopularMoviesPagingData(): Flow<PagingData<MovieEntity>> {
+        return Pager(
+            config = PagingConfig(pageSize = 60, maxSize = 200, enablePlaceholders = false),
+            pagingSourceFactory = { MoviesPagingSource(repository = this, limit = 60) }
+        ).flow
     }
 }

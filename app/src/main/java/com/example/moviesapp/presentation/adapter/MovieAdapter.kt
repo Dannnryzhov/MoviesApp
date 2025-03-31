@@ -1,10 +1,8 @@
 package com.example.moviesapp.presentation.adapter
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
+import androidx.paging.PagingDataAdapter
 import com.bumptech.glide.Glide
 import com.example.moviesapp.databinding.ItemMovieBinding
 import com.example.moviesapp.domain.models.MovieEntity
@@ -12,14 +10,15 @@ import com.example.moviesapp.domain.models.MovieEntity
 class MovieAdapter(
     private val onItemClick: (MovieEntity) -> Unit,
     private val onItemLongClick: (MovieEntity) -> Unit
-) : ListAdapter<MovieEntity, MovieAdapter.MovieViewHolder>(MovieDiffCallBack()) {
+) : PagingDataAdapter<MovieEntity, MovieAdapter.MovieViewHolder>(MovieDiffCallBack()) {
 
     inner class MovieViewHolder(private val binding: ItemMovieBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+        androidx.recyclerview.widget.RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(movie: MovieEntity) {
+        fun bind(movie: MovieEntity?) {
+            if (movie == null) return
             binding.tvMovieTitle.text = movie.name
-            movie.year.toString().also { binding.tvMovieRelease.text = it }
+            binding.tvMovieRelease.text = movie.year.toString()
 
             Glide.with(binding.ivMoviePoster.context)
                 .load(movie.poster.url)
@@ -47,3 +46,4 @@ class MovieAdapter(
         holder.bind(getItem(position))
     }
 }
+
