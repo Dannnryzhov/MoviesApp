@@ -81,13 +81,11 @@ class FavouriteMoviesFragment : BaseFragment<FragmentFavouriteMoviesBinding, Fav
             movie.name ?: "Неизвестное название",
             movie.description ?: "Нет описания",
             movie.poster.url ?: "",
-            movie.genres.joinToString(", ") ?: "",
-            movie.countries.joinToString(", ") ?: ""
+            movie.genres.joinToString(", ") { it.genre },
+            movie.countries.joinToString(", ") { it.country }
         )
         findNavController().navigate(action)
     }
-
-
     private fun onMovieLongClicked(movie: MovieEntity) {
         viewModel.removeFavouriteMovie(movie)
     }

@@ -80,8 +80,8 @@ class MovieListFragment : BaseFragment<FragmentMovieListBinding, MovieListViewMo
             movie.name ?: "Неизвестное название",
             movie.description ?: "Нет описания",
             movie.poster.url ?: "",
-            movie.genres.joinToString(", ") ?: "",
-            movie.countries.joinToString(", ") ?: ""
+            movie.genres.joinToString(", ") { it.genre },
+            movie.countries.joinToString(", ") { it.country }
         )
         findNavController().navigate(action)
     }
