@@ -10,7 +10,10 @@
         android:label="Movies">
         <action
             android:id="@+id/action_movieListFragment_to_favouriteMoviesFragment"
-            app:destination="@id/favouriteMoviesFragment"/>
+            app:destination="@id/favouriteMoviesFragment" />
+        <action
+            android:id="@+id/action_movieListFragment_to_movieDetailFragment"
+            app:destination="@id/movieDetailFragment" />
     </fragment>
 
     <fragment
@@ -19,6 +22,40 @@
         android:label="Favourites">
         <action
             android:id="@+id/action_favouriteMoviesFragment_to_movieListFragment"
-            app:destination="@id/movieListFragment"/>
+            app:destination="@id/movieListFragment" />
+        <action
+            android:id="@+id/action_favouriteMoviesFragment_to_movieDetailFragment"
+            app:destination="@id/movieDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/movieDetailFragment"
+        android:name="com.example.moviesapp.presentation.ui.fragments.MovieDetailFragment"
+        android:label="Movie Details">
+        <argument
+            android:name="movieId"
+            app:argType="integer" />
+        <argument
+            android:name="movieName"
+            app:argType="string" />
+        <argument
+            android:name="movieDescription"
+            app:argType="string" />
+        <argument
+            android:name="moviePosterUrl"
+            app:argType="string" />
+        <argument
+            android:name="movieGenres"
+            app:argType="string" />
+        <argument
+            android:name="movieCountries"
+            app:argType="string" />
+
+        <action
+            android:id="@+id/action_movieDetailFragment_to_movieListFragment"
+            app:destination="@id/movieListFragment" />
+        <action
+            android:id="@+id/action_movieDetailFragment_to_favouriteMoviesFragment"
+            app:destination="@id/favouriteMoviesFragment" />
     </fragment>
 </navigation>

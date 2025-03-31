@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.moviesapp.presentation.viewmodel.FavouriteMoviesViewModel
 import com.example.moviesapp.presentation.viewmodel.HostViewModel
+import com.example.moviesapp.presentation.viewmodel.MovieDetailViewModel
 import com.example.moviesapp.presentation.viewmodel.MovieListViewModel
 import com.example.moviesapp.presentation.viewmodel.ViewModelFactory
 import dagger.Binds
@@ -28,6 +29,11 @@ interface ViewModelModule {
     @IntoMap
     @ViewModelKey(HostViewModel::class)
     fun bindHostViewModel(hostViewModel: HostViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(MovieDetailViewModel::class)
+    fun bindMovieDetailViewModel(movieDetailViewModel: MovieDetailViewModel): ViewModel
 
     @Binds
     @Singleton

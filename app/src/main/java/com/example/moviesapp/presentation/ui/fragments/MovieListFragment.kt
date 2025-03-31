@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.example.moviesapp.databinding.FragmentMovieListBinding
 import com.example.moviesapp.domain.models.MovieEntity
 import com.example.moviesapp.presentation.adapter.MovieAdapter
@@ -74,6 +75,15 @@ class MovieListFragment : BaseFragment<FragmentMovieListBinding, MovieListViewMo
     }
 
     private fun onMovieClicked(movie: MovieEntity) {
+        val action = MovieListFragmentDirections.actionMovieListFragmentToMovieDetailFragment(
+            movie.id,
+            movie.name ?: "Неизвестное название",
+            movie.description ?: "Нет описания",
+            movie.poster.url ?: "",
+            movie.genres.joinToString(", ") ?: "",
+            movie.countries.joinToString(", ") ?: ""
+        )
+        findNavController().navigate(action)
     }
 
     private fun onMovieLongClicked(movie: MovieEntity) {
