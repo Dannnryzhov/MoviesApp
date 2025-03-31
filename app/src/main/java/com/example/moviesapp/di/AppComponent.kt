@@ -4,6 +4,7 @@ import android.app.Application
 import com.example.moviesapp.presentation.ui.activity.MainActivity
 import com.example.moviesapp.presentation.ui.fragments.FavouriteMoviesFragment
 import com.example.moviesapp.presentation.ui.fragments.HostFragment
+import com.example.moviesapp.presentation.ui.fragments.MovieDetailFragment
 import com.example.moviesapp.presentation.ui.fragments.MovieListFragment
 import dagger.BindsInstance
 import dagger.Component
@@ -24,6 +25,7 @@ interface AppComponent {
     fun inject(fragment: MovieListFragment)
     fun inject(fragment: FavouriteMoviesFragment)
     fun inject(fragment:HostFragment)
+    fun inject(fragment: MovieDetailFragment)
 
     @Component.Factory
     interface Factory{
