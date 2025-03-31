@@ -1,5 +1,6 @@
 package com.example.moviesapp.presentation.ui.fragments
 
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,8 +14,7 @@ import com.example.moviesapp.presentation.adapter.MovieAdapter
 import com.example.moviesapp.presentation.application.MoviesApp
 import com.example.moviesapp.presentation.viewmodel.MovieListViewModel
 import com.example.moviesapp.presentation.viewmodel.ViewModelFactory
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -42,10 +42,10 @@ class MovieListFragment : BaseFragment<FragmentMovieListBinding, MovieListViewMo
         )
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: android.os.Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
-        observeMovies()
+        observePopularMovies()
         setupSearch()
     }
 
@@ -58,20 +58,14 @@ class MovieListFragment : BaseFragment<FragmentMovieListBinding, MovieListViewMo
             val query = editable?.toString() ?: ""
             viewModel.search(query)
         }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.searchResults.collect { searchResults ->
-                moviesAdapter.submitList(searchResults)
-            }
-        }
     }
 
-    private fun observeMovies() {
-        viewModel.movies
-            .onEach { movies ->
-                moviesAdapter.submitList(movies)
+    private fun observePopularMovies() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.popularMovies.collectLatest { pagingData ->
+                moviesAdapter.submitData(pagingData)
             }
-            .launchIn(viewLifecycleOwner.lifecycleScope)
+        }
     }
 
     private fun onMovieClicked(movie: MovieEntity) {
@@ -80,8 +74,8 @@ class MovieListFragment : BaseFragment<FragmentMovieListBinding, MovieListViewMo
             movie.name ?: "Неизвестное название",
             movie.description ?: "Нет описания",
             movie.poster.url ?: "",
-            movie.genres.joinToString(", ") ?: "",
-            movie.countries.joinToString(", ") ?: ""
+            movie.genres.joinToString(", ") { it.genre },
+            movie.countries.joinToString(", ") { it.country }
         )
         findNavController().navigate(action)
     }
@@ -90,3 +84,4 @@ class MovieListFragment : BaseFragment<FragmentMovieListBinding, MovieListViewMo
         viewModel.addToFavouriteMovie(movie)
     }
 }
+

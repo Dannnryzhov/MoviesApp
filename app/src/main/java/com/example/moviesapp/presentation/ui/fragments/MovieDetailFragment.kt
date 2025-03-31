@@ -24,9 +24,8 @@ class MovieDetailFragment : BaseFragment<FragmentMovieDetailBinding, MovieDetail
 
     private val args: MovieDetailFragmentArgs by navArgs()
 
-    override fun inflateBinding(inflater: LayoutInflater, container: ViewGroup?): FragmentMovieDetailBinding {
-        return FragmentMovieDetailBinding.inflate(inflater, container, false)
-    }
+    override fun inflateBinding(inflater: LayoutInflater, container: ViewGroup?): FragmentMovieDetailBinding =
+        FragmentMovieDetailBinding.inflate(inflater, container, false)
 
     override fun injectDependencies() {
         (requireActivity().application as MoviesApp).component.inject(this)
@@ -34,18 +33,28 @@ class MovieDetailFragment : BaseFragment<FragmentMovieDetailBinding, MovieDetail
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val movieName = args.movieName
-        val movieDescription = args.movieDescription
-        val moviePosterUrl = args.moviePosterUrl
-
-        val movieGenres = args.movieGenres.split(", ").map { GenreEntity(it) }
-        val movieCountries = args.movieCountries.split(", ").map { CountryEntity(it) }
-
-        updateUI(movieName, movieDescription, movieGenres, movieCountries, moviePosterUrl)
+        setupUI()
     }
 
-    private fun updateUI(name: String, description: String, genres: List<GenreEntity>, countries: List<CountryEntity>, posterUrl: String) {
+    private fun setupUI() {
+        with(args) {
+            val movieName = movieName
+            val movieDescription = movieDescription
+            val posterUrl = moviePosterUrl
+            val genres = movieGenres.split(", ").map { GenreEntity(it) }
+            val countries = movieCountries.split(", ").map { CountryEntity(it) }
+
+            updateUI(movieName, movieDescription, genres, countries, posterUrl)
+        }
+    }
+
+    private fun updateUI(
+        name: String,
+        description: String,
+        genres: List<GenreEntity>,
+        countries: List<CountryEntity>,
+        posterUrl: String
+    ) {
         binding.tvTitle.text = name
         binding.tvDescription.text = description
 
@@ -59,5 +68,5 @@ class MovieDetailFragment : BaseFragment<FragmentMovieDetailBinding, MovieDetail
             .centerCrop()
             .into(binding.ivPoster)
     }
-
 }
+

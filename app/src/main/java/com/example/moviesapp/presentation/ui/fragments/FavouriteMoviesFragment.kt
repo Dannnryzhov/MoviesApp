@@ -8,6 +8,7 @@ import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.paging.PagingData
 import com.example.moviesapp.databinding.FragmentFavouriteMoviesBinding
 import com.example.moviesapp.domain.models.MovieEntity
 import com.example.moviesapp.presentation.adapter.MovieAdapter
@@ -57,7 +58,7 @@ class FavouriteMoviesFragment : BaseFragment<FragmentFavouriteMoviesBinding, Fav
     private fun observeFavouriteMovies() {
         viewModel.favouriteMovies
             .onEach { movies ->
-                favouriteMoviesAdapter.submitList(movies)
+                favouriteMoviesAdapter.submitData(lifecycle, PagingData.from(movies))
             }
             .launchIn(viewLifecycleOwner.lifecycleScope)
     }
@@ -70,10 +71,11 @@ class FavouriteMoviesFragment : BaseFragment<FragmentFavouriteMoviesBinding, Fav
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.searchResults.collect { searchResults ->
-                favouriteMoviesAdapter.submitList(searchResults)
+                favouriteMoviesAdapter.submitData(lifecycle, PagingData.from(searchResults))
             }
         }
     }
+
 
     private fun onMovieClicked(movie: MovieEntity) {
         val action = FavouriteMoviesFragmentDirections.actionFavouriteMoviesFragmentToMovieDetailFragment(
@@ -81,13 +83,11 @@ class FavouriteMoviesFragment : BaseFragment<FragmentFavouriteMoviesBinding, Fav
             movie.name ?: "Неизвестное название",
             movie.description ?: "Нет описания",
             movie.poster.url ?: "",
-            movie.genres.joinToString(", ") ?: "",
-            movie.countries.joinToString(", ") ?: ""
+            movie.genres.joinToString(", ") { it.genre },
+            movie.countries.joinToString(", ") { it.country }
         )
         findNavController().navigate(action)
     }
-
-
     private fun onMovieLongClicked(movie: MovieEntity) {
         viewModel.removeFavouriteMovie(movie)
     }
