@@ -8,6 +8,7 @@ import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.paging.PagingData
 import com.example.moviesapp.R
 import com.example.moviesapp.databinding.FragmentMovieListBinding
 import com.example.moviesapp.domain.models.MovieEntity
@@ -15,6 +16,7 @@ import com.example.moviesapp.presentation.adapter.MovieAdapter
 import com.example.moviesapp.presentation.application.MoviesApp
 import com.example.moviesapp.presentation.viewmodel.MovieListViewModel
 import com.example.moviesapp.presentation.viewmodel.ViewModelFactory
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -43,12 +45,14 @@ class MovieListFragment : BaseFragment<FragmentMovieListBinding, MovieListViewMo
         )
     }
 
+    private var currentCollectionJob: Job? = null
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
-        observePopularMovies()
-        observeFavoriteMovies()
         setupSearch()
+        observeFavoriteMovies()
+        observePopularMovies()
     }
 
     private fun setupRecyclerView() {
@@ -58,7 +62,29 @@ class MovieListFragment : BaseFragment<FragmentMovieListBinding, MovieListViewMo
     private fun setupSearch() {
         binding.searchEditText.addTextChangedListener { editable ->
             val query = editable?.toString() ?: ""
-            viewModel.search(query)
+            currentCollectionJob?.cancel()
+            if (query.isBlank()) {
+                observePopularMovies()
+            } else {
+                viewModel.search(query)
+                observeSearchResults()
+            }
+        }
+    }
+
+    private fun observePopularMovies() {
+        currentCollectionJob = viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.popularMovies.collectLatest { pagingData ->
+                moviesAdapter.submitData(pagingData)
+            }
+        }
+    }
+
+    private fun observeSearchResults() {
+        currentCollectionJob = viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.searchResults.collectLatest { results ->
+                moviesAdapter.submitData(lifecycle, PagingData.from(results))
+            }
         }
     }
 
@@ -66,14 +92,6 @@ class MovieListFragment : BaseFragment<FragmentMovieListBinding, MovieListViewMo
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.favoriteMovies.collect { favorites ->
                 moviesAdapter.updateFavoriteMovies(favorites)
-            }
-        }
-    }
-
-    private fun observePopularMovies() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.popularMovies.collectLatest { pagingData ->
-                moviesAdapter.submitData(pagingData)
             }
         }
     }
@@ -95,3 +113,4 @@ class MovieListFragment : BaseFragment<FragmentMovieListBinding, MovieListViewMo
         viewModel.addToFavouriteMovie(movie)
     }
 }
+

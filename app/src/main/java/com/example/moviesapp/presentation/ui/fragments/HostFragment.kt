@@ -45,10 +45,8 @@ class HostFragment : BaseFragment<FragmentHostBinding, HostViewModel>() {
             childFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
 
-        // Настраиваем нижнюю навигацию
         NavigationUI.setupWithNavController(binding.bottomNavigationView, navController)
 
-        // Обработка кнопки "Назад"
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 if (binding.fragmentContainerLand != null) {
@@ -64,16 +62,13 @@ class HostFragment : BaseFragment<FragmentHostBinding, HostViewModel>() {
             }
         })
 
-        // Если есть правая панель — режим ландшафтной ориентации
         if (binding.fragmentContainerLand != null) {
             navController.addOnDestinationChangedListener { controller, destination, arguments ->
                 if (destination.id == R.id.movieDetailFragment) {
-                    // Загружаем детальный фрагмент в правую панель
                     childFragmentManager.beginTransaction()
                         .replace(R.id.fragment_container_land, MovieDetailFragment::class.java, arguments)
                         .commit()
 
-                    // Узнаем источник вызова
                     val source = arguments?.getString("sourceFragment")
                     when (source) {
                         "favorites" -> {
@@ -84,7 +79,6 @@ class HostFragment : BaseFragment<FragmentHostBinding, HostViewModel>() {
                         }
                     }
                 } else {
-                    // Если не детальный экран — очищаем правую панель
                     childFragmentManager.findFragmentById(R.id.fragment_container_land)?.let { fragment ->
                         childFragmentManager.beginTransaction().remove(fragment).commit()
                     }

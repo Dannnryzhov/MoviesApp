@@ -16,6 +16,8 @@ import com.example.moviesapp.presentation.adapter.MovieAdapter
 import com.example.moviesapp.presentation.application.MoviesApp
 import com.example.moviesapp.presentation.viewmodel.FavouriteMoviesViewModel
 import com.example.moviesapp.presentation.viewmodel.ViewModelFactory
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -45,34 +47,44 @@ class FavouriteMoviesFragment : BaseFragment<FragmentFavouriteMoviesBinding, Fav
         )
     }
 
+    private var currentCollectionJob: Job? = null
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
-        observeFavouriteMovies()
         setupSearch()
+        observeFavouriteMovies()
     }
 
     private fun setupRecyclerView() {
         binding.moviesRecyclerView.adapter = favouriteMoviesAdapter
     }
 
-    private fun observeFavouriteMovies() {
-        viewModel.favouriteMovies
-            .onEach { movies ->
-                favouriteMoviesAdapter.submitData(lifecycle, PagingData.from(movies))
-            }
-            .launchIn(viewLifecycleOwner.lifecycleScope)
-    }
-
     private fun setupSearch() {
         binding.searchEditText.addTextChangedListener { editable ->
             val query = editable?.toString() ?: ""
-            viewModel.search(query)
+            currentCollectionJob?.cancel()
+            if (query.isBlank()) {
+                observeFavouriteMovies()
+            } else {
+                viewModel.search(query)
+                observeSearchResults()
+            }
         }
+    }
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.searchResults.collect { searchResults ->
-                favouriteMoviesAdapter.submitData(lifecycle, PagingData.from(searchResults))
+    private fun observeFavouriteMovies() {
+        currentCollectionJob = viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.favouriteMovies.collectLatest { movies ->
+                favouriteMoviesAdapter.submitData(lifecycle, PagingData.from(movies))
+            }
+        }
+    }
+
+    private fun observeSearchResults() {
+        currentCollectionJob = viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.searchResults.collectLatest { results ->
+                favouriteMoviesAdapter.submitData(lifecycle, PagingData.from(results))
             }
         }
     }
@@ -94,3 +106,4 @@ class FavouriteMoviesFragment : BaseFragment<FragmentFavouriteMoviesBinding, Fav
         viewModel.removeFavouriteMovie(movie)
     }
 }
+
