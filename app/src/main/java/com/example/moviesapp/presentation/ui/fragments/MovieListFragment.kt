@@ -47,6 +47,7 @@ class MovieListFragment : BaseFragment<FragmentMovieListBinding, MovieListViewMo
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
         observePopularMovies()
+        observeFavoriteMovies()
         setupSearch()
     }
 
@@ -58,6 +59,14 @@ class MovieListFragment : BaseFragment<FragmentMovieListBinding, MovieListViewMo
         binding.searchEditText.addTextChangedListener { editable ->
             val query = editable?.toString() ?: ""
             viewModel.search(query)
+        }
+    }
+
+    private fun observeFavoriteMovies() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.favoriteMovies.collect { favorites ->
+                moviesAdapter.updateFavoriteMovies(favorites)
+            }
         }
     }
 
