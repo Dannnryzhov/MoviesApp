@@ -8,6 +8,7 @@ import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.example.moviesapp.R
 import com.example.moviesapp.databinding.FragmentMovieListBinding
 import com.example.moviesapp.domain.models.MovieEntity
 import com.example.moviesapp.presentation.adapter.MovieAdapter
@@ -69,19 +70,19 @@ class MovieListFragment : BaseFragment<FragmentMovieListBinding, MovieListViewMo
     }
 
     private fun onMovieClicked(movie: MovieEntity) {
-        val action = MovieListFragmentDirections.actionMovieListFragmentToMovieDetailFragment(
-            movie.id,
-            movie.name ?: "Неизвестное название",
-            movie.description ?: "Нет описания",
-            movie.poster.url ?: "",
-            movie.genres.joinToString(", ") { it.genre },
-            movie.countries.joinToString(", ") { it.country }
-        )
-        findNavController().navigate(action)
+        val bundle = Bundle().apply {
+            putString("sourceFragment", "list")
+            putInt("movieId", movie.id)
+            putString("movieName", movie.name ?: "Неизвестное название")
+            putString("movieDescription", movie.description ?: "Нет описания")
+            putString("moviePosterUrl", movie.poster.url ?: "")
+            putString("movieGenres", movie.genres.joinToString(", ") { it.genre })
+            putString("movieCountries", movie.countries.joinToString(", ") { it.country })
+        }
+        findNavController().navigate(R.id.action_movieListFragment_to_movieDetailFragment, bundle)
     }
 
     private fun onMovieLongClicked(movie: MovieEntity) {
         viewModel.addToFavouriteMovie(movie)
     }
 }
-
