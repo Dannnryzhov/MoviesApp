@@ -4,10 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
-import androidx.lifecycle.ViewModelProvider
 import com.example.moviesapp.R
 import com.example.moviesapp.databinding.FragmentHostBinding
 import com.example.moviesapp.presentation.application.MoviesApp
@@ -42,8 +43,47 @@ class HostFragment : BaseFragment<FragmentHostBinding, HostViewModel>() {
 
         val navHostFragment =
             childFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-        val navController = navHostFragment.navController
+        navController = navHostFragment.navController
 
         NavigationUI.setupWithNavController(binding.bottomNavigationView, navController)
+
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (binding.fragmentContainerLand != null) {
+                    val detailFragment = childFragmentManager.findFragmentById(R.id.fragment_container_land)
+                    if (detailFragment != null) {
+                        childFragmentManager.beginTransaction().remove(detailFragment).commit()
+                        return
+                    }
+                }
+                if (!navController.popBackStack()) {
+                    requireActivity().finish()
+                }
+            }
+        })
+
+        if (binding.fragmentContainerLand != null) {
+            navController.addOnDestinationChangedListener { controller, destination, arguments ->
+                if (destination.id == R.id.movieDetailFragment) {
+                    childFragmentManager.beginTransaction()
+                        .replace(R.id.fragment_container_land, MovieDetailFragment::class.java, arguments)
+                        .commit()
+
+                    val source = arguments?.getString("sourceFragment")
+                    when (source) {
+                        "favorites" -> {
+                            controller.popBackStack(R.id.favouriteMoviesFragment, false)
+                        }
+                        else -> {
+                            controller.popBackStack(R.id.movieListFragment, false)
+                        }
+                    }
+                } else {
+                    childFragmentManager.findFragmentById(R.id.fragment_container_land)?.let { fragment ->
+                        childFragmentManager.beginTransaction().remove(fragment).commit()
+                    }
+                }
+            }
+        }
     }
 }

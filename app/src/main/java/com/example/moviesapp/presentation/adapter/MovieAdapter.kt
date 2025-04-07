@@ -1,6 +1,7 @@
 package com.example.moviesapp.presentation.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import com.bumptech.glide.Glide
@@ -11,6 +12,22 @@ class MovieAdapter(
     private val onItemClick: (MovieEntity) -> Unit,
     private val onItemLongClick: (MovieEntity) -> Unit
 ) : PagingDataAdapter<MovieEntity, MovieAdapter.MovieViewHolder>(MovieDiffCallBack()) {
+
+    private var favoriteMovieIds: Set<Int> = emptySet()
+
+    fun updateFavoriteMovies(favoriteMovies: List<MovieEntity>) {
+        val newFavoriteIds = favoriteMovies.map { it.id }.toSet()
+        snapshot().forEachIndexed { index, movie ->
+            if (movie != null) {
+                val wasFavorite = favoriteMovieIds.contains(movie.id)
+                val isFavorite = newFavoriteIds.contains(movie.id)
+                if (wasFavorite != isFavorite) {
+                    notifyItemChanged(index)
+                }
+            }
+        }
+        favoriteMovieIds = newFavoriteIds
+    }
 
     inner class MovieViewHolder(private val binding: ItemMovieBinding) :
         androidx.recyclerview.widget.RecyclerView.ViewHolder(binding.root) {
@@ -24,6 +41,13 @@ class MovieAdapter(
                 .load(movie.poster.url)
                 .centerCrop()
                 .into(binding.ivMoviePoster)
+
+            // Изменение видимости иконки избранного
+            binding.ivFavoriteIcon.visibility = if (favoriteMovieIds.contains(movie.id)) {
+                View.VISIBLE
+            } else {
+                View.INVISIBLE
+            }
 
             binding.root.setOnClickListener { onItemClick(movie) }
             binding.root.setOnLongClickListener {
@@ -46,4 +70,3 @@ class MovieAdapter(
         holder.bind(getItem(position))
     }
 }
-

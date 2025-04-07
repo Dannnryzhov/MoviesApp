@@ -17,9 +17,10 @@ class MovieListViewModel @Inject constructor(
     private val manageFavouriteUseCase: ManageFavouriteUseCase
 ) : SearchViewModel() {
 
-    // Используем Flow с PagingData для популярных фильмов
     val popularMovies: Flow<PagingData<MovieEntity>> =
         getPopularMoviesPagingDataUseCase().cachedIn(viewModelScope)
+
+    val favoriteMovies: Flow<List<MovieEntity>> = manageFavouriteUseCase.getFavourites()
 
     fun addToFavouriteMovie(movie: MovieEntity) {
         viewModelScope.launch(exceptionHandler) {
